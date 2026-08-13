@@ -1,4 +1,4 @@
-const CACHE = "colas-shell-v1";
+const CACHE = "colas-shell-v2"; // sube este número cada vez que cambien los archivos del shell
 const SHELL = [
   "./index.html",
   "./style.css",
@@ -22,11 +22,22 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
-// Shell: cache-first. Datos en vivo (nuestra API /api/queue-times o queue-times.com directo): siempre red.
+// Shell: stale-while-revalidate — sirve la caché al instante pero la refresca en segundo
+// plano en cada carga, así la siguiente vez ya hay una versión nueva sin depender de
+// acordarnos de subir CACHE a mano. Datos en vivo (API): siempre red, nunca caché.
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (url.hostname.includes("queue-times.com") || url.pathname.startsWith("/api/")) return;
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+    caches.open(CACHE).then(async (cache) => {
+      const cached = await cache.match(e.request);
+      const networkFetch = fetch(e.request)
+        .then((res) => {
+          if (res && res.status === 200) cache.put(e.request, res.clone());
+          return res;
+        })
+        .catch(() => cached);
+      return cached || networkFetch;
+    })
   );
 });
