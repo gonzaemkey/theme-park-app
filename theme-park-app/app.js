@@ -120,7 +120,7 @@ const ICONS = {
 function categoryFor(name) {
   const n = name.toLowerCase();
   if (n.includes("disney")) return "disney";
-  if (n.includes("universal") || n.includes("epic universe")) return "universal";
+  if (n.includes("universal") || n.includes("epic universe") || n.includes("islands of adventure")) return "universal";
   if (n.includes("water") || n.includes("volcano") || n.includes("aquatica")) return "water";
   return "coaster";
 }
@@ -254,8 +254,8 @@ function render() {
 
 async function refreshOpenParks() {
   pulseDot.classList.add("pulse");
-  const open = [...state.openParks];
-  await runLimited(open, 3, (id) => loadPark(id));
+  const loaded = [...state.cache.keys()];
+  await runLimited(loaded, 3, (id) => loadPark(id));
   lastSyncEl.textContent = `Última sync: ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
   render();
   setTimeout(() => pulseDot.classList.remove("pulse"), 900);
@@ -263,11 +263,10 @@ async function refreshOpenParks() {
 
 async function init() {
   render();
-  // Precarga favoritos (o Madrid por defecto si no hay favoritos aún)
+  // Precarga datos de resumen (favoritos, o grupo España si no hay favoritos) SIN expandir las tarjetas
   const toPreload = state.favorites.size > 0
     ? [...state.favorites]
     : PARK_GROUPS[0].parks.map((p) => p.id); // grupo España por defecto
-  toPreload.forEach((id) => state.openParks.add(id));
   await runLimited(toPreload, 3, (id) => loadPark(id));
   lastSyncEl.textContent = `Última sync: ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
   render();
