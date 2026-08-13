@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Colas — Tiempos de espera</title>
+<meta name="description" content="Tiempos de espera en vivo de tus parques temáticos favoritos." />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#000000" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icons/icon.svg" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="dots">
+        <span></span><span></span><span></span>
+        <span></span><span class="pulse" id="pulse-dot"></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <h1>COLAS<span>.</span></h1>
+    </div>
+    <div class="status-line">
+      <span id="last-sync">Sincronizando…</span>
+      <span>Auto-refresh · 5 min</span>
+    </div>
+  </header>
+
+  <nav class="filters" id="filters"></nav>
+
+  <main id="main">
+    <div class="loading-state">Cargando parques…</div>
+  </main>
+
+  <footer class="attribution">
+    Powered by <a href="https://queue-times.com/" target="_blank" rel="noopener">Queue-Times.com</a>
+  </footer>
+
+  <script src="parks.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
