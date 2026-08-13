@@ -119,7 +119,8 @@ const ICONS = {
 
 function categoryFor(name) {
   const n = name.toLowerCase();
-  if (n.includes("disney")) return "disney";
+  const disneyExtras = ["magic kingdom", "epcot", "hollywood studios", "animal kingdom"];
+  if (n.includes("disney") || disneyExtras.includes(n)) return "disney";
   if (n.includes("universal") || n.includes("epic universe") || n.includes("islands of adventure")) return "universal";
   if (n.includes("water") || n.includes("volcano") || n.includes("aquatica")) return "water";
   return "coaster";
