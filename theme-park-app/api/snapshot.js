@@ -43,32 +43,34 @@ async function runLimited(items, limit, fn) {
   await Promise.all(workers);
 }
 
-export default async function handler(req) {
-  const key = req.headers.get("x-cron-key");
-  if (!process.env.CRON_SECRET || key !== process.env.CRON_SECRET) {
-    return new Response(JSON.stringify({ error: "unauthorized" }), {
-      status: 401,
-      headers: { "content-type": "application/json" },
-    });
-  }
-
-  let parksProcessed = 0;
-  let rowsInserted = 0;
-  const errors = [];
-
-  await runLimited(PARK_IDS, 5, async (parkId) => {
-    try {
-      const rides = await fetchParkRides(parkId);
-      const n = await insertSnapshots(parkId, rides);
-      parksProcessed += 1;
-      rowsInserted += n;
-    } catch (e) {
-      errors.push({ parkId, error: String(e && e.message ? e.message : e) });
+export default {
+  async fetch(req) {
+    const key = req.headers.get("x-cron-key");
+    if (!process.env.CRON_SECRET || key !== process.env.CRON_SECRET) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
     }
-  });
 
-  return new Response(
-    JSON.stringify({ success: true, parksProcessed, rowsInserted, errors }),
-    { status: 200, headers: { "content-type": "application/json" } }
-  );
-}
+    let parksProcessed = 0;
+    let rowsInserted = 0;
+    const errors = [];
+
+    await runLimited(PARK_IDS, 5, async (parkId) => {
+      try {
+        const rides = await fetchParkRides(parkId);
+        const n = await insertSnapshots(parkId, rides);
+        parksProcessed += 1;
+        rowsInserted += n;
+      } catch (e) {
+        errors.push({ parkId, error: String(e && e.message ? e.message : e) });
+      }
+    });
+
+    return new Response(
+      JSON.stringify({ success: true, parksProcessed, rowsInserted, errors }),
+      { status: 200, headers: { "content-type": "application/json" } }
+    );
+  },
+};
