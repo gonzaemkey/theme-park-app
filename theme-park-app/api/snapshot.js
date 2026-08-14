@@ -4,8 +4,6 @@
 import { neon } from "@neondatabase/serverless";
 import { PARK_IDS } from "./_parks.js";
 
-export const config = { runtime: "edge" };
-
 const sql = neon(process.env.DATABASE_URL);
 
 async function fetchParkRides(parkId) {
@@ -33,7 +31,7 @@ async function insertSnapshots(parkId, rides) {
   return rides.length;
 }
 
-// Limita cuántas parques se procesan en paralelo
+// Limita cuántos parques se procesan en paralelo
 async function runLimited(items, limit, fn) {
   const queue = [...items];
   const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
